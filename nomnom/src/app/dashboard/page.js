@@ -1,12 +1,17 @@
 "use client";
 
-import { FaRegCalendar } from "react-icons/fa";
 import { IoIosTimer } from "react-icons/io";
 import { IoOptions } from "react-icons/io5";
-import { FaChevronDown } from "react-icons/fa";
+import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 import { CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts";
+import { useEffect, useState } from "react";
 
 export default function Page() {
+  const [timeSubcategory, setTimeSubcategory] = useState(0); // 0 for Hour, 1 for Daily
+  const [showTimeSubcategory, setShowTimeSubcategory] = useState(false);
+
+  const [metric, setMetric] = useState("Sales");
+  const [showMetric, setShowMetric] = useState(false);
   const data = [
     {
       name: "Monday",
@@ -59,27 +64,96 @@ export default function Page() {
 
         <div className="flex flex-row justify-between">
           <h1 className="text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            Dashboard
+            Analytics Dashboard
           </h1>
 
           {/* Timing Selections */}
+
           <div className="flex flex-row gap-x-2 text-md font-medium">
-            <div className="flex items-center gap-2 rounded-lg border-zinc-400 border-2 bg-black text-white p-2">
-              <FaRegCalendar />
-              <p>18 - 25 November, 2026 </p>
-              <FaChevronDown />
+            <div
+              htmlFor="date-picker"
+              className="flex items-center gap-2 rounded-lg border-zinc-400 border-2 bg-black text-white p-2"
+            >
+              <input id="startdate-picker" type="date" />
+              <p>-</p>
+              <input id="enddate-picker" type="date" />
             </div>
 
-            <div className="flex items-center gap-1 rounded-lg border-zinc-400 border-2 bg-black text-white p-2">
-              <IoIosTimer />
-              <p>Hourly</p>
-              <FaChevronDown />
+            <div className="flex flex-col relative">
+              <button
+                onClick={() => {
+                  setShowTimeSubcategory(!showTimeSubcategory);
+                }}
+                className="flex items-center gap-1 rounded-lg border-zinc-400 border-2 bg-black text-white p-2"
+              >
+                <IoIosTimer />
+                <p>By {timeSubcategory ? "Day" : "Hour"}</p>
+                {showTimeSubcategory ? <FaChevronUp /> : <FaChevronDown />}
+              </button>
+
+              {showTimeSubcategory && (
+                <button
+                  onClick={() => {
+                    setTimeSubcategory(!timeSubcategory);
+                    setShowTimeSubcategory(false);
+                  }}
+                  className="z-30 w-full flex items-center justify-center gap-1 rounded-lg border-zinc-400 border-2 bg-black text-white p-2 absolute top-15 hover:cursor-pointer hover:bg-zinc-300 hover:text-black transition duration-200 "
+                >
+                  <p>By {!timeSubcategory ? "Day" : "Hour"}</p>
+                </button>
+              )}
             </div>
 
-            <div className="flex items-center gap-1 rounded-lg border-zinc-400 border-2 bg-black text-white p-2">
-              <IoOptions />
-              <p>Sales</p>
-              <FaChevronDown />
+            {/* Metric Selection */}
+            <div className="flex flex-col relative">
+              <button
+                onClick={() => {
+                  setShowMetric(!showMetric);
+                }}
+                className="flex items-center gap-1 rounded-lg border-zinc-400 border-2 bg-black text-white p-2"
+              >
+                <IoOptions />
+                <p>By {metric}</p>
+                {showMetric ? <FaChevronUp /> : <FaChevronDown />}
+              </button>
+
+              <div className="w-full absolute top-15 gap-2.5 flex flex-col">
+                {showMetric && metric != "Sales" && (
+                  <button
+                    onClick={() => {
+                      setMetric("Sales");
+                      setShowMetric(false);
+                    }}
+                    className="z-30 w-full flex items-center justify-center gap-1 rounded-lg border-zinc-400 border-2 bg-black text-white p-2 hover:cursor-pointer hover:bg-zinc-300 hover:text-black transition duration-200 "
+                  >
+                    <p>By Sales</p>
+                  </button>
+                )}
+
+                {showMetric && metric != "Ingredient" && (
+                  <button
+                    onClick={() => {
+                      setMetric("Ingredient");
+                      setShowMetric(false);
+                    }}
+                    className="z-30 w-full flex items-center justify-center gap-1 rounded-lg border-zinc-400 border-2 bg-black text-white p-2 hover:cursor-pointer hover:bg-zinc-300 hover:text-black transition duration-200 "
+                  >
+                    <p>By Ingredient</p>
+                  </button>
+                )}
+
+                {showMetric && metric != "Menu Item" && (
+                  <button
+                    onClick={() => {
+                      setMetric("Menu Item");
+                      setShowMetric(false);
+                    }}
+                    className="z-30 w-full flex items-center justify-center gap-1 rounded-lg border-zinc-400 border-2 bg-black text-white p-2  hover:cursor-pointer hover:bg-zinc-300 hover:text-black transition duration-200 "
+                  >
+                    <p>By Menu Item</p>
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -89,18 +163,16 @@ export default function Page() {
           <LineChart
             style={{
               width: "100%",
-              aspectRatio: 2,
-              maxWidth: 1400,
+              aspectRatio: 3,
               margin: "auto",
             }}
-            responsive
+            responsive={true}
             data={data}
           >
             <CartesianGrid stroke="#eee" strokeDasharray="5 5" />
             <XAxis dataKey="name" />
             <YAxis width="auto" />
             <Line type="monotone" dataKey="uv" stroke="#8884d8" />
-            <Line type="monotone" dataKey="pv" stroke="#82ca9d" />
           </LineChart>
         </div>
       </main>
