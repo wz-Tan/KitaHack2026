@@ -3,15 +3,28 @@
 import { IoIosTimer } from "react-icons/io";
 import { IoOptions } from "react-icons/io5";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
+import { CiBurger } from "react-icons/ci";
 import { CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts";
 import { useEffect, useState } from "react";
 
 export default function Page() {
+  // Metrics
+  const metrics = ["Ingredients", "Sales", "Menu Item"];
+
+  // Example Food Items
+  const menuItems = ["Chicken Rice", "Noodles", "Soup"];
+  const ingredients = ["Rice", "Chicken", "Coriander"];
+
   const [timeSubcategory, setTimeSubcategory] = useState(0); // 0 for Hour, 1 for Daily
   const [showTimeSubcategory, setShowTimeSubcategory] = useState(false);
 
-  const [metric, setMetric] = useState("Sales");
+  const [metric, setMetric] = useState(metrics[0]);
   const [showMetric, setShowMetric] = useState(false);
+
+  const [showSpecifics, setShowSpecifics] = useState(false);
+  const [currentMenuItem, setCurrentMenuItem] = useState(menuItems[0]);
+  const [currentIngredient, setCurrentIngredient] = useState(ingredients[0]);
+
   const data = [
     {
       name: "Monday",
@@ -109,6 +122,7 @@ export default function Page() {
               <button
                 onClick={() => {
                   setShowMetric(!showMetric);
+                  setShowSpecifics(false);
                 }}
                 className="flex items-center gap-1 rounded-lg border-zinc-400 border-2 bg-black text-white p-2"
               >
@@ -118,43 +132,102 @@ export default function Page() {
               </button>
 
               <div className="w-full absolute top-15 gap-2.5 flex flex-col">
-                {showMetric && metric != "Sales" && (
-                  <button
-                    onClick={() => {
-                      setMetric("Sales");
-                      setShowMetric(false);
-                    }}
-                    className="z-30 w-full flex items-center justify-center gap-1 rounded-lg border-zinc-400 border-2 bg-black text-white p-2 hover:cursor-pointer hover:bg-zinc-300 hover:text-black transition duration-200 "
-                  >
-                    <p>By Sales</p>
-                  </button>
-                )}
-
-                {showMetric && metric != "Ingredient" && (
-                  <button
-                    onClick={() => {
-                      setMetric("Ingredient");
-                      setShowMetric(false);
-                    }}
-                    className="z-30 w-full flex items-center justify-center gap-1 rounded-lg border-zinc-400 border-2 bg-black text-white p-2 hover:cursor-pointer hover:bg-zinc-300 hover:text-black transition duration-200 "
-                  >
-                    <p>By Ingredient</p>
-                  </button>
-                )}
-
-                {showMetric && metric != "Menu Item" && (
-                  <button
-                    onClick={() => {
-                      setMetric("Menu Item");
-                      setShowMetric(false);
-                    }}
-                    className="z-30 w-full flex items-center justify-center gap-1 rounded-lg border-zinc-400 border-2 bg-black text-white p-2  hover:cursor-pointer hover:bg-zinc-300 hover:text-black transition duration-200 "
-                  >
-                    <p>By Menu Item</p>
-                  </button>
-                )}
+                {showMetric
+                  ? metrics.map((value, key) => {
+                      if (metric != value) {
+                        return (
+                          <button
+                            key={key}
+                            onClick={() => {
+                              setMetric(value);
+                              setShowMetric(false);
+                            }}
+                            className="z-30 w-full flex items-center justify-center gap-1 rounded-lg border-zinc-400 border-2 bg-black text-white p-2 hover:cursor-pointer hover:bg-zinc-300 hover:text-black transition duration-200 "
+                          >
+                            <p>By {value}</p>
+                          </button>
+                        );
+                      }
+                    })
+                  : null}
               </div>
             </div>
+
+            {/* Specific Selections */}
+            {/* Menu Item */}
+            {metric === "Menu Item" ? (
+              <div className="flex flex-col relative">
+                <button
+                  onClick={() => {
+                    setShowSpecifics(!showSpecifics);
+                  }}
+                  className="flex items-center gap-1 rounded-lg border-zinc-400 border-2 bg-black text-white p-2"
+                >
+                  <CiBurger />
+                  <p>{currentMenuItem}</p>
+                  {showSpecifics ? <FaChevronUp /> : <FaChevronDown />}
+                </button>
+
+                <div className="w-full absolute top-15 gap-2.5 flex flex-col">
+                  {showSpecifics
+                    ? menuItems.map((value, key) => {
+                        if (currentMenuItem != value) {
+                          return (
+                            <button
+                              key={key}
+                              onClick={() => {
+                                setCurrentMenuItem(value);
+                                setShowSpecifics(false);
+                              }}
+                              className="z-30 w-full flex items-center justify-center gap-1 rounded-lg border-zinc-400 border-2 bg-black text-white p-2 hover:cursor-pointer hover:bg-zinc-300 hover:text-black transition duration-200 "
+                            >
+                              <p>{value}</p>
+                            </button>
+                          );
+                        }
+                      })
+                    : null}
+                </div>
+              </div>
+            ) : null}
+
+            {/* Ingredients */}
+            {/* Menu Item */}
+            {metric === "Ingredients" ? (
+              <div className="flex flex-col relative">
+                <button
+                  onClick={() => {
+                    setShowSpecifics(!showSpecifics);
+                  }}
+                  className="flex items-center gap-1 rounded-lg border-zinc-400 border-2 bg-black text-white p-2"
+                >
+                  <CiBurger />
+                  <p>{currentIngredient}</p>
+                  {showSpecifics ? <FaChevronUp /> : <FaChevronDown />}
+                </button>
+
+                <div className="w-full absolute top-15 gap-2.5 flex flex-col">
+                  {showSpecifics
+                    ? ingredients.map((value, key) => {
+                        if (currentIngredient != value) {
+                          return (
+                            <button
+                              key={key}
+                              onClick={() => {
+                                setCurrentIngredient(value);
+                                setShowSpecifics(false);
+                              }}
+                              className="z-30 w-full flex items-center justify-center gap-1 rounded-lg border-zinc-400 border-2 bg-black text-white p-2 hover:cursor-pointer hover:bg-zinc-300 hover:text-black transition duration-200 "
+                            >
+                              <p>{value}</p>
+                            </button>
+                          );
+                        }
+                      })
+                    : null}
+                </div>
+              </div>
+            ) : null}
           </div>
         </div>
 
