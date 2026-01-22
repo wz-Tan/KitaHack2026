@@ -27,7 +27,7 @@ export default function Page() {
           <input
             id="passwordInput"
             type="password"
-            className="w-4/5 rounded-xl bg-white/10 p-3 text-white focus:outline-none focus:ring-0"
+            className="w-4/5 rounded-xl bg-white/10 p-3 text-white  focus:outline-none focus:ring-0"
             placeholder="Enter Password Here"
           />
           <button className="p-2 px-6 rounded-xl text-xl bg-white text-black mt-5 transition duration-200 hover:cursor-pointer hover:bg-zinc-900 hover:text-white">

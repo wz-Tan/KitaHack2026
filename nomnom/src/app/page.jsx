@@ -3,7 +3,7 @@
 export default function Home() {
   function handleFileUpload(e) {
     let uploadedFile = e.target.files[0];
-    // Send File to Backend
+    console.log("Uploaded file is ", uploadedFile);
   }
 
   return (
@@ -22,7 +22,7 @@ export default function Home() {
           type="file"
           id="file-upload"
           className="hidden"
-          // accept=".csv"
+          accept=".csv"
           onChange={handleFileUpload}
         />
 

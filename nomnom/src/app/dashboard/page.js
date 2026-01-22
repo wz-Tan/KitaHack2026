@@ -75,7 +75,7 @@ export default function Page() {
       <main className="flex flex-col text-white w-full h-full gap-5 p-20">
         {/* Title and Selections */}
 
-        <div className="flex flex-row justify-between">
+        <div className="flex flex-row flex-wrap justify-between">
           <h1 className="text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
             Analytics Dashboard
           </h1>
