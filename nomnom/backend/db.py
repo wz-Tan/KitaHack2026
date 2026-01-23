@@ -13,4 +13,17 @@ app = firebase_admin.initialize_app(cred)
 
 # Connect to Firestore
 firestore_client = firestore.client(app)
-print("Firestore client is ", firestore_client)
+
+# Writing Data into Firebase
+ingredient_data = {"name": "rice", "duration": 10, "price": 15}
+firestore_client.collection("ingredients").document("a2").set(ingredient_data)
+
+# Retrieve All Fields from A Collection
+docs = firestore_client.collection("ingredients").stream()
+for document in docs:
+    print("Document is ", document.to_dict())
+
+# Retrieve Data Entry
+doc = firestore_client.collection("ingredients").document("a1").get()
+if doc.exists:
+    print("Document data is", doc.to_dict())
