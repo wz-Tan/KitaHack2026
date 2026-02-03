@@ -1,8 +1,0 @@
-day,is_holiday,food_prepared,leftover
-weekday,False,16000,300
-weekday,False,16500,350
-weekday,False,17000,400
-weekday,False,17500,420
-weekday,False,18500,600
-weekend,False,22000,1300
-weekend,True,25000,2500
