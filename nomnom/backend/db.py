@@ -143,6 +143,7 @@ def minus_inventory(dataframe,menu_item_df,ingredients_df,inventory_df):
                 #get duration from INGREDIENTS
                 duration=timedelta(days=int(ingredients_df.loc[ingredientid]['duration']))
                 latestdate=orderdatetime-duration
+                #sort accoding to date
                 batcharray=ingredients_df.loc[ingredientid]['batch']
                 sortedbatch=inventory_df[inventory_df['date']>=latestdate].sort_values(by="date").index.tolist()
                 sortedarray=[key for key in sortedbatch if key in batcharray]
@@ -157,78 +158,6 @@ def minus_inventory(dataframe,menu_item_df,ingredients_df,inventory_df):
                         print(f"minus {min(quantityleft,batchquantity)} in INVENTORY {sortedarray[batch]} of {ingredientid}")
                         quantityleft=quantityleft-min(quantityleft,batchquantity)
                     batch+=1
-minus_inventory(df,menu_item,ingredients,inventory)
-
-
-
-
-
-
-
-
-
-
-# with open("nomnom/backend/csv/ingredients.csv","w",newline='') as f:
-#     csvwriter=csv.writer(f)
-#     for index,rows in ingredients.iterrows():
-#         csvwriter.writerow([index,rows['duration'],rows['name'],rows['price']])
-
-
-
-
-# consumed_ingredients=makedataframe('consumed_ingredients')
-# print(consumed_ingredients)
-# try:
-#     dict=makedataframe('gay')
-# except Exception:
-#     dict={}
-# print(dict)
-#print(str(datetime.strptime('03/01/2025',"%d/%m/%Y").date()))
-
-
-
-
-
-
-# Minus ingredient quantity in INGREDIENTS and INVENTORY
-# def minus_inventory(dataframe,menu_collection,ingredients_collection,inventory_collection):
-#     for index,row in dataframe.iterrows():
-#         foodarray=row['food_id'].split(", ")
-#         date=datetime.strptime(row['date'],"%d/%m/%Y").date()
-#         time=datetime.strptime(row['time'],"%I:%M %p").time()
-#         orderdatetime=datetime.combine(date,time).replace(tzinfo=timezone.utc)
-#         for foodid in foodarray:
-#             #get ingredient id and quantity in MENU ITEMS
-#             for ingredientdict in menu_collection.document(foodid).get().to_dict()['ingredient']:
-#                 for ingredientid,quantity in ingredientdict.items():
-#                     #minus inventory in INGREDIENTS
-#                     ingredients_collection.document(ingredientid).update({'total':Increment(-1*quantity)})
-#                     #get duration from INGREDIENTS
-#                     duration=timedelta(days=ingredients_collection.document(ingredientid).get().to_dict()['duration'])
-#                     latestdate=orderdatetime-duration
-#                     batcharray=ingredients_collection.document(ingredientid).get().to_dict()['batch']
-#                     sortedbatch=inventory_collection.where("date",'>=',latestdate).order_by('date').get()
-#                     sortedarray=[x for x in sortedbatch if x.id in batcharray]
-#                     batch=0
-#                     while quantity!=0:
-#                         batchquantity=inventory_collection.document(sortedarray[batch]).get().to_dict()['items'][ingredientid]
-#                         inventory_collection.document(sortedarray[batch]).update({f"items.{ingredientid}":Increment(-1*min(quantity,batchquantity))})
-#                         quantity=quantity-min(quantity,batchquantity)
-#                         batch+=1
-                    
-
 #minus_inventory(df,menu_item,ingredients,inventory)
 
 
-#docs = firestore_client.collection("ingredients").stream()
-
-# Retrieve Data Entry
-#doc = firestore_client.collection("ingredients").document("a1").get(
-# for x in inventory.where("date","<=",datetime.now()).order_by('date').get():
-#     print (x.id, datetime.now(timezone.utc)-x.to_dict()['date'])
-# print(ingredients.document('a1').get().to_dict()['batch'])
-
-# date=datetime.strptime('03/01/2025',"%d/%m/%Y").date()
-# time=datetime.strptime('07:19 PM',"%I:%M %p").time()
-# orderdatetime=datetime.combine(date,time).replace(tzinfo=timezone.utc)
-# print(orderdatetime)
