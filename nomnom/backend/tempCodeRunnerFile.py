@@ -1,0 +1,1 @@
+                print(batcharray,sortedbatch,sortedarray,quantityleft,length)
