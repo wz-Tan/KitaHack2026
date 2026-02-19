@@ -99,7 +99,7 @@ def makedataframe(collection):
     df=pd.DataFrame(array)
     df=df.set_index('id')
     return df
-df=pd.read_csv("nomnom/backend/csv/restaurant_order_history_mapped.csv")
+# df=pd.read_csv("nomnom/backend/csv/restaurant_order_history_mapped.csv")
 menu_item = makedataframe("menu_item")
 ingredients = makedataframe("ingredients")
 inventory=makedataframe("inventory")
