@@ -93,6 +93,33 @@ def add_inventory():
     return jsonify({"status": "success"})
 
 
+@app.route("/actions/create_menu_item", methods=["POST"])
+def create_menu_item():
+    # Receive CSV File
+    file = request.files["file"]
+    database.create_menu_item(file)
+    print("Create menu item")
+    return jsonify({"status": "success"})
+
+
+@app.route("/actions/create_ingredients", methods=["POST"])
+def create_ingredients():
+    # Receive CSV File
+    file = request.files["file"]
+    database.create_ingredients(file)
+    print("Create ingredients")
+    return jsonify({"status": "success"})
+
+
+@app.route("/actions/record_sales", methods=["POST"])
+def record_sales():
+    # Receive CSV File
+    file = request.files["file"]
+    database.record_sales(file)
+    print("Record sales")
+    return jsonify({"status": "success"})
+
+
 # Run the server
 if __name__ == "__main__":
     app.run(debug=True)
