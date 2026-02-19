@@ -1,5 +1,4 @@
 order_id,food_id,time,date,day
-1,"m7,m11,m11",07:19 PM,03/01/2025,Friday
 2,"m6,m11,m8",03:54 PM,14/01/2025,Tuesday
 3,"m1,m8,m11",02:33 PM,17/01/2025,Friday
 4,"m6,m8,m1,m3",02:30 PM,20/01/2025,Monday
