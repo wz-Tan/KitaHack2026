@@ -235,3 +235,14 @@ def record_sales(input_csv_path):
 
     ingredient_per_day(df, menu_item)
     minus_inventory(df, menu_item, ingredients, inventory)
+
+
+# Dashboard Functions
+def list_ingredients():
+    ingredients = makedataframe("ingredients")
+    return ingredients["name"].tolist()
+
+
+def list_menuItems():
+    menu_items = makedataframe("menu_item")
+    return menu_items["name"].tolist()

@@ -83,6 +83,18 @@ def dashboard():
     return jsonify({"total_sales_records": total_sales, "sales_by_food": food_count})
 
 
+@app.route("/dashboard/ingredients", methods=["GET"])
+def list_ingredients():
+    ingredients = database.list_ingredients()
+    return jsonify({"ingredients": ingredients})
+
+
+@app.route("/dashboard/menu_items", methods=["GET"])
+def list_menuItems():
+    menu_items = database.list_menuItems()
+    return jsonify({"menu_items": menu_items})
+
+
 # User Actions
 @app.route("/actions/add_inventory", methods=["POST"])
 def add_inventory():

@@ -12,8 +12,12 @@ export default function Page() {
   const metrics = ["Ingredients", "Sales", "Menu Item"];
 
   // Example Food Items
-  const menuItems = ["Chicken Rice", "Noodles", "Soup"];
-  const ingredients = ["Rice", "Chicken", "Coriander"];
+  const [menuItems, setMenuItems] = useState(["Chicken Rice", "Noodles"]);
+  const [ingredients, setIngredients] = useState([
+    "Rice",
+    "Chicken",
+    "Coriander",
+  ]);
 
   const [timeSubcategory, setTimeSubcategory] = useState(0); // 0 for Hour, 1 for Daily
   const [showTimeSubcategory, setShowTimeSubcategory] = useState(false);
@@ -24,6 +28,40 @@ export default function Page() {
   const [showSpecifics, setShowSpecifics] = useState(false);
   const [currentMenuItem, setCurrentMenuItem] = useState(menuItems[0]);
   const [currentIngredient, setCurrentIngredient] = useState(ingredients[0]);
+
+  async function retrieve_ingredient_list() {
+    let res = await fetch("http://127.0.0.1:5000/dashboard/ingredients", {
+      method: "GET",
+      headers: { "Content-type": "application/json" },
+    });
+    res = await res.json();
+    return res.ingredients;
+  }
+
+  async function retrieve_menu_items() {
+    let res = await fetch("http://127.0.0.1:5000/dashboard/menu_items", {
+      method: "GET",
+      headers: { "Content-type": "application/json" },
+    });
+    res = await res.json();
+    return res.menu_items;
+  }
+
+  // Start Up Queries
+  useEffect(() => {
+    async function init() {
+      // Get Ingredients
+      let fetchedIngredients = await retrieve_ingredient_list();
+      setIngredients(fetchedIngredients);
+      setCurrentIngredient(fetchedIngredients[0]);
+
+      // Get Menu Items
+      let fetchedMenuItems = await retrieve_menu_items();
+      setMenuItems(fetchedMenuItems);
+      setCurrentMenuItem(fetchedMenuItems[0]);
+    }
+    init();
+  }, []);
 
   const data = [
     {
