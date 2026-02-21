@@ -111,11 +111,19 @@ def add_inventory(inventory_input_csvpath):
         doc = firestore_client.collection("inventory").document(rows["batch"]).get()
         if doc.exists:
             firestore_client.collection("inventory").document(rows["batch"]).update(
-                {"date": datetime.fromisoformat(rows["date"]), "current_items": rows["items"], "initial_items": rows["items"]}
+                {
+                    "date": datetime.fromisoformat(rows["date"]),
+                    "current_items": rows["items"],
+                    "initial_items": rows["items"],
+                }
             )
         else:
             firestore_client.collection("inventory").document(rows["batch"]).set(
-                {"date": datetime.fromisoformat(rows["date"]), "current_items": rows["items"], "initial_items": rows["items"]}
+                {
+                    "date": datetime.fromisoformat(rows["date"]),
+                    "current_items": rows["items"],
+                    "initial_items": rows["items"],
+                }
             )
         print(f"{rows['batch']} done in INVENTORY")
         for item_id, quantity in rows["items"].items():
@@ -127,7 +135,8 @@ def add_inventory(inventory_input_csvpath):
             )
             print(f"{item_id} done in INGREDIENTS")
 
-#add_inventory('nomnom/backend/csv/inventory_input.csv')
+
+# add_inventory('nomnom/backend/csv/inventory_input.csv')
 
 # CREATING AND POPULATING PROCESSED TABLES USING FIREBASE DATAFRAME AND ORDER CSV
 
@@ -153,11 +162,11 @@ def ingredient_per_day(order_df, menu_item_df):
         foodarray = row["food_id"].split(",")
         date = str(datetime.strptime(row["date"], "%d/%m/%Y").date())
         if dict.get(date) is None:
-            dict[date] = {"ingredient":{},"menu_item":{}}        
+            dict[date] = {"ingredient": {}, "menu_item": {}}
         for foodid in foodarray:
             dict[date]["menu_item"][foodid] = (
-                    dict[date]["ingredient"].get(foodid, 0) + 1
-                )
+                dict[date]["ingredient"].get(foodid, 0) + 1
+            )
             for ingredientid, ingredientquantity in menu_item_df.loc[foodid][
                 "ingredient"
             ].items():
@@ -170,7 +179,10 @@ def ingredient_per_day(order_df, menu_item_df):
             dict_data
         )
         print(f"{dict_id} done")
-ingredient_per_day(pd.read_csv('nomnom/backend/csv/restaurant_order_history_mapped.csv'), makedataframe("menu_item"))
+
+
+# ingredient_per_day(pd.read_csv('nomnom/backend/csv/restaurant_order_history_mapped.csv'), makedataframe("menu_item"))
+
 
 # MINUS INVENTORY USING FIREBASE DATAFRAME AND ORDER CSV
 def minus_inventory(dataframe, menu_item_df, ingredients_df, inventory_df):
@@ -205,7 +217,6 @@ def minus_inventory(dataframe, menu_item_df, ingredients_df, inventory_df):
                 batch = 0
                 length = len(sortedarray)
                 quantityleft = quantity
-                print(batcharray, sortedbatch, sortedarray, quantityleft, length)
                 while quantityleft != 0 and batch < length:
                     batchquantity = (
                         firestore_client.collection("inventory")
@@ -251,3 +262,49 @@ def list_menuItems():
     menu_items = makedataframe("menu_item")
     return menu_items["name"].tolist()
 
+
+def retrieveSales(startDate, endDate):
+    all_sales = makedataframe("sales_record")
+
+    start = datetime.strptime(startDate, "%Y-%m-%d")
+    end = datetime.strptime(endDate, "%Y-%m-%d")
+    weeks = (end - start).days // 7
+
+    data = [
+        {"sum": float(0)},
+        {"sum": float(0)},
+        {"sum": float(0)},
+        {"sum": float(0)},
+        {"sum": float(0)},
+        {"sum": float(0)},
+        {"sum": float(0)},
+    ]
+
+    # Log into the data
+    for idx, row in all_sales.iterrows():
+        if startDate <= idx <= endDate:
+            print("index ", idx)
+            record = row["menu_item"]
+
+            # Get the Day (0 - 6 is Monday to Sunday)
+            d = datetime.strptime(str(idx), "%Y-%m-%d").weekday()
+
+            sum = 0
+
+            # Get the sum of sales
+            for value in dict(record).values():
+                sum += value
+
+            data[d]["sum"] += sum
+
+        elif idx > endDate:
+            break
+
+    for row in data:
+        try:
+            row["sum"] /= weeks
+        except ZeroDivisionError:
+            pass
+
+    print("Total sales retrieved", data)
+    return data
