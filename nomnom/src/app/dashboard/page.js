@@ -4,10 +4,48 @@ import { IoIosTimer } from "react-icons/io";
 import { IoOptions } from "react-icons/io5";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 import { CiBurger } from "react-icons/ci";
-import { CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts";
+import {
+  CartesianGrid,
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  XAxis,
+  YAxis,
+} from "recharts";
 import { useEffect, useState } from "react";
 
 export default function Page() {
+  const [chartData, setChartData] = useState([
+    {
+      name: "Monday",
+      uv: 0,
+    },
+    {
+      name: "Tuesday",
+      uv: 0,
+    },
+    {
+      name: "Wednesday",
+      uv: 0,
+    },
+    {
+      name: "Thursday",
+      uv: 0,
+    },
+    {
+      name: "Friday",
+      uv: 0,
+    },
+    {
+      name: "Saturday",
+      uv: 0,
+    },
+    {
+      name: "Sunday",
+      uv: 0,
+    },
+  ]);
+
   // Metrics
   const metrics = ["Ingredients", "Sales", "Menu Item"];
 
@@ -50,11 +88,19 @@ export default function Page() {
     return res.menu_items;
   }
 
-  // Query Annalysis from Backend
+  // Query Analysis from Backend
   async function retrieve_data() {
-    if (startDate && endDate) {
+    if (startDate != "" && endDate != "") {
       if (metric === "Sales") {
         let total_sales = await retrieve_sales();
+        // Update Graph Data
+        setChartData((prev) =>
+          prev.map((item, index) => ({
+            ...item,
+            uv: total_sales[index].sum ?? item.uv, // fallback if undefined
+          })),
+        );
+        console.log("Updated data to", total_sales);
       } else if (metric === "Menu Item") {
         let menu_item_usage = await retrieve_menu_item_usage();
       } else if (metric === "Ingredients") {
@@ -119,51 +165,6 @@ export default function Page() {
     init();
   }, []);
 
-  const data = [
-    {
-      name: "Monday",
-      uv: 4000,
-      pv: 2400,
-      amt: 2400,
-    },
-    {
-      name: "Tuesday",
-      uv: 3000,
-      pv: 1398,
-      amt: 2210,
-    },
-    {
-      name: "Wednesday",
-      uv: 2000,
-      pv: 9800,
-      amt: 2290,
-    },
-    {
-      name: "Thursday",
-      uv: 2780,
-      pv: 3908,
-      amt: 2000,
-    },
-    {
-      name: "Friday",
-      uv: 1890,
-      pv: 4800,
-      amt: 2181,
-    },
-    {
-      name: "Saturday",
-      uv: 2390,
-      pv: 3800,
-      amt: 2500,
-    },
-    {
-      name: "Sunday",
-      uv: 3490,
-      pv: 4300,
-      amt: 2100,
-    },
-  ];
-
   return (
     <div className="flex min-h-screen bg-zinc-50 dark:bg-black font-sans">
       <main className="flex flex-col text-white w-full h-full gap-5 p-20">
@@ -203,7 +204,7 @@ export default function Page() {
               />
             </div>
 
-            <div className="flex flex-col relative">
+            {/* <div className="flex flex-col relative">
               <button
                 onClick={() => {
                   setShowTimeSubcategory(!showTimeSubcategory);
@@ -226,7 +227,7 @@ export default function Page() {
                   <p>By {!timeSubcategory ? "Day" : "Hour"}</p>
                 </button>
               )}
-            </div>
+            </div>*/}
 
             {/* Metric Selection */}
             <div className="flex flex-col relative">
@@ -354,20 +355,14 @@ export default function Page() {
 
         {/* Dashboard Container*/}
         <div className="rounded-2xl p-2 flex flex-col w-full min-h-160">
-          <LineChart
-            style={{
-              width: "100%",
-              aspectRatio: 3,
-              margin: "auto",
-            }}
-            responsive={true}
-            data={data}
-          >
-            <CartesianGrid stroke="#eee" strokeDasharray="5 5" />
-            <XAxis dataKey="name" />
-            <YAxis width="auto" />
-            <Line type="monotone" dataKey="uv" stroke="#8884d8" />
-          </LineChart>
+          <ResponsiveContainer width="100%" aspect={3}>
+            <LineChart data={chartData}>
+              <CartesianGrid stroke="#eee" strokeDasharray="5 5" />
+              <XAxis dataKey="name" />
+              <YAxis />
+              <Line type="monotone" dataKey="uv" stroke="#8884d8" />
+            </LineChart>
+          </ResponsiveContainer>
         </div>
       </main>
     </div>

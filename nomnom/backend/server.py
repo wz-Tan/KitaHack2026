@@ -104,6 +104,7 @@ def return_ingredients_usage():
     startDate = received_data["startDate"]
     endDate = received_data["endDate"]
     ingredient = received_data["currentIngredient"]
+    print("Ingredient usage called with ", received_data)
     # Function Call Here
     return jsonify({"Ingredient usage is ": ""})
 
@@ -123,8 +124,9 @@ def return_sales():
     received_data = request.get_json()
     startDate = received_data["startDate"]
     endDate = received_data["endDate"]
+    sales_data = database.retrieveSales(startDate, endDate)
     # Function Call Here
-    return jsonify({"sales": 10})
+    return jsonify({"sales": sales_data})
 
 
 # User Actions
