@@ -166,7 +166,7 @@ def ingredient_per_day(order_df, menu_item_df):
                 )
     print(dict)
     for dict_id, dict_data in dict.items():
-        firestore_client.collection("consumed_ingredients").document(str(dict_id)).set(
+        firestore_client.collection("sales_record").document(str(dict_id)).set(
             dict_data
         )
         print(f"{dict_id} done")
@@ -249,9 +249,33 @@ def list_ingredients():
 
 def list_menuItems():
     menu_items = makedataframe("menu_item")
-<<<<<<< HEAD
     return menu_items["name"].tolist()
 
-=======
-    return menu_items["name"].tolist()
->>>>>>> 21390c9e59fa1da92dd55aa731bf081f4bc7c9f8
+def menu_item_among_timeframe(startdate,enddate,menu_item_id,sales_record_df):
+    sales_record_df.index=pd.to_datetime(sales_record_df.index)
+    record=[
+        {"sum":0,"counter":0},
+        {"sum":0,"counter":0},
+        {"sum":0,"counter":0},
+        {"sum":0,"counter":0},
+        {"sum":0,"counter":0},
+        {"sum":0,"counter":0},
+        {"sum":0,"counter":0},
+    ]
+    returnts=[0,0,0,0,0,0,0]
+    for index,rows in sales_record_df.iterrows():
+        if startdate<=index<=enddate:
+            if menu_item_id in rows['menu_item']:
+                record[index.dayofweek]['sum']+=rows['menu_item'][menu_item_id]
+                record[index.dayofweek]['counter']+=1
+    print(record)
+    for x in range(7):
+        try:
+            returnts[x]=record[x]['sum']/record[x]['counter']
+        except:
+            pass
+
+    return returnts
+
+print(menu_item_among_timeframe(datetime(2025,1,3),datetime(2026,1,20),'m8',makedataframe("sales_record")))
+
