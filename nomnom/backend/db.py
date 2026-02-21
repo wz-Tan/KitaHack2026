@@ -111,11 +111,11 @@ def add_inventory(inventory_input_csvpath):
         doc = firestore_client.collection("inventory").document(rows["batch"]).get()
         if doc.exists:
             firestore_client.collection("inventory").document(rows["batch"]).update(
-                {"date": datetime.fromisoformat(rows["date"]), "items": rows["items"]}
+                {"date": datetime.fromisoformat(rows["date"]), "current_items": rows["items"], "initial_items": rows["items"]}
             )
         else:
             firestore_client.collection("inventory").document(rows["batch"]).set(
-                {"date": datetime.fromisoformat(rows["date"]), "items": rows["items"]}
+                {"date": datetime.fromisoformat(rows["date"]), "current_items": rows["items"], "initial_items": rows["items"]}
             )
         print(f"{rows['batch']} done in INVENTORY")
         for item_id, quantity in rows["items"].items():
@@ -127,6 +127,7 @@ def add_inventory(inventory_input_csvpath):
             )
             print(f"{item_id} done in INGREDIENTS")
 
+#add_inventory('nomnom/backend/csv/inventory_input.csv')
 
 # CREATING AND POPULATING PROCESSED TABLES USING FIREBASE DATAFRAME AND ORDER CSV
 
@@ -145,20 +146,23 @@ def makedataframe(collection):
 # create and populate CONSUMED_INGREDIENTS table using orderhistory csv
 def ingredient_per_day(order_df, menu_item_df):
     try:
-        dict = makedataframe("consumed_ingredients").fillna(0).to_dict(orient="index")
+        dict = makedataframe("sales_record").fillna(0).to_dict(orient="index")
     except Exception:
         dict = {}
     for index, row in order_df.iterrows():
-        foodarray = row["food_id"].split(", ")
+        foodarray = row["food_id"].split(",")
         date = str(datetime.strptime(row["date"], "%d/%m/%Y").date())
+        if dict.get(date) is None:
+            dict[date] = {"ingredient":{},"menu_item":{}}        
         for foodid in foodarray:
+            dict[date]["menu_item"][foodid] = (
+                    dict[date]["ingredient"].get(foodid, 0) + 1
+                )
             for ingredientid, ingredientquantity in menu_item_df.loc[foodid][
                 "ingredient"
             ].items():
-                if dict.get(date) is None:
-                    dict[date] = {}
-                dict[date][ingredientid] = (
-                    dict[date].get(ingredientid, 0) + ingredientquantity
+                dict[date]["ingredient"][ingredientid] = (
+                    dict[date]["ingredient"].get(ingredientid, 0) + ingredientquantity
                 )
     print(dict)
     for dict_id, dict_data in dict.items():
@@ -166,7 +170,7 @@ def ingredient_per_day(order_df, menu_item_df):
             dict_data
         )
         print(f"{dict_id} done")
-
+ingredient_per_day(pd.read_csv('nomnom/backend/csv/restaurant_order_history_mapped.csv'), makedataframe("menu_item"))
 
 # MINUS INVENTORY USING FIREBASE DATAFRAME AND ORDER CSV
 def minus_inventory(dataframe, menu_item_df, ingredients_df, inventory_df):
@@ -207,14 +211,14 @@ def minus_inventory(dataframe, menu_item_df, ingredients_df, inventory_df):
                         firestore_client.collection("inventory")
                         .document(sortedarray[batch])
                         .get()
-                        .to_dict()["items"][ingredientid]
+                        .to_dict()["current_items"][ingredientid]
                     )
                     if batchquantity > 0:
                         firestore_client.collection("inventory").document(
                             sortedarray[batch]
                         ).update(
                             {
-                                f"items.{ingredientid}": Increment(
+                                f"current_items.{ingredientid}": Increment(
                                     -1 * min(quantityleft, batchquantity)
                                 )
                             }
@@ -246,3 +250,4 @@ def list_ingredients():
 def list_menuItems():
     menu_items = makedataframe("menu_item")
     return menu_items["name"].tolist()
+
