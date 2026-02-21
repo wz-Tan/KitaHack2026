@@ -19,6 +19,9 @@ export default function Page() {
     "Coriander",
   ]);
 
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+
   const [timeSubcategory, setTimeSubcategory] = useState(0); // 0 for Hour, 1 for Daily
   const [showTimeSubcategory, setShowTimeSubcategory] = useState(false);
 
@@ -45,6 +48,59 @@ export default function Page() {
     });
     res = await res.json();
     return res.menu_items;
+  }
+
+  // Query Annalysis from Backend
+  async function retrieve_data() {
+    if (startDate && endDate) {
+      if (metric === "Sales") {
+        let total_sales = await retrieve_sales();
+      } else if (metric === "Menu Item") {
+        let menu_item_usage = await retrieve_menu_item_usage();
+      } else if (metric === "Ingredients") {
+        let ingredient_usage = await retrieve_ingredient_usage();
+      }
+    }
+  }
+
+  async function retrieve_ingredient_usage() {
+    let res = await fetch("http://127.0.0.1:5000/dashboard/ingredients_usage", {
+      method: "POST",
+      headers: { "Content-type": "application/json" },
+      body: JSON.stringify({
+        startDate,
+        endDate,
+        currentIngredient,
+      }),
+    });
+    res = res.json();
+  }
+
+  async function retrieve_sales() {
+    let res = await fetch("http://127.0.0.1:5000/dashboard/sales", {
+      method: "POST",
+      headers: { "Content-type": "application/json" },
+      body: JSON.stringify({
+        startDate,
+        endDate,
+      }),
+    });
+    res = await res.json();
+    return res.sales;
+  }
+
+  async function retrieve_menu_item_usage() {
+    let res = await fetch("http://127.0.0.1:5000/dashboard/menu_item_usage", {
+      method: "POST",
+      headers: { "Content-type": "application/json" },
+      body: JSON.stringify({
+        startDate,
+        endDate,
+        currentMenuItem,
+      }),
+    });
+    res = await res.json();
+    return res.ingredients;
   }
 
   // Start Up Queries
@@ -119,15 +175,32 @@ export default function Page() {
           </h1>
 
           {/* Timing Selections */}
-
           <div className="flex flex-row gap-x-2 text-md font-medium">
             <div
               htmlFor="date-picker"
               className="flex items-center gap-2 rounded-lg border-zinc-400 border-2 bg-black text-white p-2"
             >
-              <input id="startdate-picker" type="date" />
+              <input
+                id="startdate-picker"
+                type="date"
+                value={startDate}
+                onChange={(e) => {
+                  if (e.target.value <= endDate || endDate === "") {
+                    setStartDate(e.target.value);
+                  }
+                }}
+              />
               <p>-</p>
-              <input id="enddate-picker" type="date" />
+              <input
+                id="enddate-picker"
+                type="date"
+                value={endDate}
+                onChange={(e) => {
+                  if (e.target.value >= startDate || startDate === "") {
+                    setEndDate(e.target.value);
+                  }
+                }}
+              />
             </div>
 
             <div className="flex flex-col relative">
@@ -266,6 +339,16 @@ export default function Page() {
                 </div>
               </div>
             ) : null}
+
+            {/* Action Button */}
+            <button
+              onClick={async () => {
+                await retrieve_data();
+              }}
+              className="flex items-center gap-1 rounded-lg border-black border-2 bg-white text-black p-2 px-10 hover:cursor-pointer hover:bg-green-600 hover:text-white transition-colors duration-200"
+            >
+              <p>Run Query</p>
+            </button>
           </div>
         </div>
 
