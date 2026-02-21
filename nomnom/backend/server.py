@@ -95,6 +95,38 @@ def list_menuItems():
     return jsonify({"menu_items": menu_items})
 
 
+# Queries to Be Displayed into the Graph
+
+
+@app.route("/dashboard/ingredients_usage", methods=["POST"])
+def return_ingredients_usage():
+    received_data = request.get_json()
+    startDate = received_data["startDate"]
+    endDate = received_data["endDate"]
+    ingredient = received_data["currentIngredient"]
+    # Function Call Here
+    return jsonify({"Ingredient usage is ": ""})
+
+
+@app.route("/dashboard/menu_item_usage", methods=["POST"])
+def return_menu_item_usage():
+    received_data = request.get_json()
+    startDate = received_data["startDate"]
+    endDate = received_data["endDate"]
+    menuItem = received_data["currentMenuItem"]
+    # Function Call Here
+    return jsonify({"Ingredient usage is ": ""})
+
+
+@app.route("/dashboard/sales", methods=["POST"])
+def return_sales():
+    received_data = request.get_json()
+    startDate = received_data["startDate"]
+    endDate = received_data["endDate"]
+    # Function Call Here
+    return jsonify({"sales": 10})
+
+
 # User Actions
 @app.route("/actions/add_inventory", methods=["POST"])
 def add_inventory():

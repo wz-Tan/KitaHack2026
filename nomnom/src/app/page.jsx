@@ -52,7 +52,7 @@ export default function Home() {
           </h1>
         </div>
 
-        <div className="flex flex-wrap gap-4">
+        <div className="flex flex-wrap gap-4 items-center justify-center">
           {[
             "Add Inventory",
             "Create Menu Item",

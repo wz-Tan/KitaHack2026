@@ -249,5 +249,9 @@ def list_ingredients():
 
 def list_menuItems():
     menu_items = makedataframe("menu_item")
+<<<<<<< HEAD
     return menu_items["name"].tolist()
 
+=======
+    return menu_items["name"].tolist()
+>>>>>>> 21390c9e59fa1da92dd55aa731bf081f4bc7c9f8
