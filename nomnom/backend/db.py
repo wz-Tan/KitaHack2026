@@ -263,6 +263,61 @@ def list_menuItems():
     return menu_items["name"].tolist()
 
 
+def menu_item_among_timeframe(startdate,enddate,menu_item_id,sales_record_df):
+    sales_record_df.index=pd.to_datetime(sales_record_df.index)
+    record=[
+        {"sum":0,"counter":0},
+        {"sum":0,"counter":0},
+        {"sum":0,"counter":0},
+        {"sum":0,"counter":0},
+        {"sum":0,"counter":0},
+        {"sum":0,"counter":0},
+        {"sum":0,"counter":0},
+    ]
+    returnts=[0,0,0,0,0,0,0]
+    for index,rows in sales_record_df.iterrows():
+        if startdate<=index<=enddate:
+            if menu_item_id in rows['menu_item']:
+                record[index.dayofweek]['sum']+=rows['menu_item'][menu_item_id]
+                record[index.dayofweek]['counter']+=1
+    print(record)
+    for x in range(7):
+        try:
+            returnts[x]=record[x]['sum']/record[x]['counter']
+        except:
+            pass
+
+    return returnts
+
+def ingredient_among_timeframe(startdate,enddate,ingredient_id,sales_record_df):
+    sales_record_df.index=pd.to_datetime(sales_record_df.index)
+    record=[
+        {"sum":0,"counter":0},
+        {"sum":0,"counter":0},
+        {"sum":0,"counter":0},
+        {"sum":0,"counter":0},
+        {"sum":0,"counter":0},
+        {"sum":0,"counter":0},
+        {"sum":0,"counter":0},
+    ]
+    returnts=[0,0,0,0,0,0,0]
+    for index,rows in sales_record_df.iterrows():
+        if startdate<=index<=enddate:
+            if ingredient_id in rows['ingredient']:
+                record[index.dayofweek]['sum']+=rows['ingredient'][ingredient_id]
+                record[index.dayofweek]['counter']+=1
+    print(record)
+    for x in range(7):
+        try:
+            returnts[x]=record[x]['sum']/record[x]['counter']
+        except:
+            pass
+
+    return returnts
+
+#print(ingredient_among_timeframe(datetime(2025,1,3),datetime(2026,1,20),'a9',makedataframe("sales_record")))
+
+
 def retrieveSales(startDate, endDate):
     all_sales = makedataframe("sales_record")
 
@@ -308,3 +363,4 @@ def retrieveSales(startDate, endDate):
 
     print("Total sales retrieved", data)
     return data
+
