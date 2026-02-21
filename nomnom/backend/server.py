@@ -104,9 +104,10 @@ def return_ingredients_usage():
     startDate = received_data["startDate"]
     endDate = received_data["endDate"]
     ingredient = received_data["currentIngredient"]
-    print("Ingredient usage called with ", received_data)
+    ingredient_usage = database.retrieveIngredientSales(startDate, endDate, ingredient)
+    print("ingredient usage is ", ingredient_usage)
     # Function Call Here
-    return jsonify({"Ingredient usage is ": ""})
+    return jsonify({"ingredient_usage": ingredient_usage})
 
 
 @app.route("/dashboard/menu_item_usage", methods=["POST"])
@@ -115,8 +116,9 @@ def return_menu_item_usage():
     startDate = received_data["startDate"]
     endDate = received_data["endDate"]
     menuItem = received_data["currentMenuItem"]
+    menuItemUsage = database.retrieveMenuItemSales(startDate, endDate, menuItem)
     # Function Call Here
-    return jsonify({"Ingredient usage is ": ""})
+    return jsonify({"menu_item_usage": menuItemUsage})
 
 
 @app.route("/dashboard/sales", methods=["POST"])
