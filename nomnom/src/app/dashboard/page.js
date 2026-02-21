@@ -100,11 +100,22 @@ export default function Page() {
             uv: total_sales[index].sum ?? item.uv, // fallback if undefined
           })),
         );
-        console.log("Updated data to", total_sales);
       } else if (metric === "Menu Item") {
         let menu_item_usage = await retrieve_menu_item_usage();
+        setChartData((prev) =>
+          prev.map((item, index) => ({
+            ...item,
+            uv: menu_item_usage[index].sum ?? item.uv, // fallback if undefined
+          })),
+        );
       } else if (metric === "Ingredients") {
         let ingredient_usage = await retrieve_ingredient_usage();
+        setChartData((prev) =>
+          prev.map((item, index) => ({
+            ...item,
+            uv: ingredient_usage[index].sum ?? item.uv, // fallback if undefined
+          })),
+        );
       }
     }
   }
@@ -119,7 +130,8 @@ export default function Page() {
         currentIngredient,
       }),
     });
-    res = res.json();
+    res = await res.json();
+    return res.ingredient_usage;
   }
 
   async function retrieve_sales() {
@@ -146,7 +158,7 @@ export default function Page() {
       }),
     });
     res = await res.json();
-    return res.ingredients;
+    return res.menu_item_usage;
   }
 
   // Start Up Queries
