@@ -7,6 +7,7 @@ import firebase_admin
 from dotenv import load_dotenv
 from firebase_admin import credentials, firestore
 from flask import Flask, jsonify, request
+from chatbot import build_context_from_firebase, generate_insights
 
 # import db as database
 from flask_cors import CORS
@@ -64,23 +65,23 @@ def health_check():
 
 
 # ------ CSV preview endpoint ------
-@app.route("/csv/get", methods=["GET"])
-def get_csv():
-    # Return first 10 rows so frontend/devs can inspect data
-    return jsonify({"total_records": len(SALES_RECORDS), "sample": SALES_RECORDS[:10]})
+# @app.route("/csv/get", methods=["GET"])
+# def get_csv():
+#     # Return first 10 rows so frontend/devs can inspect data
+#     return jsonify({"total_records": len(SALES_RECORDS), "sample": SALES_RECORDS[:10]})
 
 
-# ------ Dashboard stats endpoint ------
-@app.route("/api/dashboard", methods=["GET"])
-def dashboard():
-    total_sales = len(SALES_RECORDS)
+# # ------ Dashboard stats endpoint ------
+# @app.route("/api/dashboard", methods=["GET"])
+# def dashboard():
+#     total_sales = len(SALES_RECORDS)
 
-    food_count = {}
-    for r in SALES_RECORDS:
-        food_id = r["food_id"]
-        food_count[food_id] = food_count.get(food_id, 0) + 1
+#     food_count = {}
+#     for r in SALES_RECORDS:
+#         food_id = r["food_id"]
+#         food_count[food_id] = food_count.get(food_id, 0) + 1
 
-    return jsonify({"total_sales_records": total_sales, "sales_by_food": food_count})
+#     return jsonify({"total_sales_records": total_sales, "sales_by_food": food_count})
 
 
 @app.route("/dashboard/ingredients", methods=["GET"])
@@ -166,6 +167,38 @@ def record_sales():
     database.record_sales(file)
     print("Record sales")
     return jsonify({"status": "success"})
+
+
+@app.route("/api/insights", methods=["POST"])
+def get_insights():
+    """
+    Generate AI-powered insights from Firebase data.
+
+    Request body (JSON):
+    {
+        "startDate": "2024-01-01",      # optional, defaults to 30 days ago
+        "endDate":   "2024-01-31",      # optional, defaults to today
+        "question":  "Which ingredients should I buy less of?"  # optional
+    }
+
+    Response:
+    {
+        "insights": "... Gemini's analysis ..."
+    }
+    """
+    from chatbot import build_context_from_firebase, generate_insights
+
+    received_data = request.get_json() or {}
+    start_date = received_data.get("startDate")
+    end_date   = received_data.get("endDate")
+    question   = received_data.get("question")
+
+    try:
+        context  = build_context_from_firebase(db, start_date, end_date)
+        insights = generate_insights(context, question)
+        return jsonify({"insights": insights})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 # Run the server
