@@ -1,7 +1,29 @@
+"use client";
 import { FaArrowTrendUp, FaArrowTrendDown } from "react-icons/fa6";
 import { FaRegLightbulb } from "react-icons/fa";
+import { useEffect } from "react";
 
 export default function Page() {
+  async function retrieve_insights() {
+    let startDate = "2025-01-02";
+    let endDate = "2025-04-04";
+    let res = await fetch("http://127.0.0.1:5000/api/insights", {
+      method: "POST",
+      headers: { "Content-type": "application/json" },
+      body: JSON.stringify({
+        startDate,
+        endDate,
+        question: "Give me a few suggestions for the next few weeks",
+      }),
+    });
+    res = await res.json();
+    console.log(res);
+  }
+
+  useEffect(() => {
+    retrieve_insights();
+  }, []);
+
   return (
     <div className="flex min-h-screen bg-zinc-50 dark:bg-black font-sans">
       <main className="flex flex-col text-white w-full h-full gap-3 p-20">

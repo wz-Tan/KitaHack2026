@@ -4,10 +4,10 @@ from pathlib import Path
 
 import db as database
 import firebase_admin
+from chatbot import build_context_from_firebase, generate_insights
 from dotenv import load_dotenv
 from firebase_admin import credentials, firestore
 from flask import Flask, jsonify, request
-from chatbot import build_context_from_firebase, generate_insights
 
 # import db as database
 from flask_cors import CORS
@@ -189,13 +189,15 @@ def get_insights():
     from chatbot import build_context_from_firebase, generate_insights
 
     received_data = request.get_json() or {}
-    start_date = received_data.get("startDate")
-    end_date   = received_data.get("endDate")
-    question   = received_data.get("question")
+    start_date = received_data["startDate"]
+    end_date = received_data["endDate"]
+    question = received_data["question"]
 
     try:
-        context  = build_context_from_firebase(db, start_date, end_date)
+        context = build_context_from_firebase(start_date, end_date)
+        print("context are ", context)
         insights = generate_insights(context, question)
+        print("insights are ", insights)
         return jsonify({"insights": insights})
     except Exception as e:
         return jsonify({"error": str(e)}), 500

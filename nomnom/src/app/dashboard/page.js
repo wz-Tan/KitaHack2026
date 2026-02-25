@@ -60,9 +60,6 @@ export default function Page() {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
 
-  const [timeSubcategory, setTimeSubcategory] = useState(0); // 0 for Hour, 1 for Daily
-  const [showTimeSubcategory, setShowTimeSubcategory] = useState(false);
-
   const [metric, setMetric] = useState(metrics[0]);
   const [showMetric, setShowMetric] = useState(false);
 
