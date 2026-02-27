@@ -127,23 +127,58 @@ def build_context_from_csv(sales_csv_path: str,
 
 # Gemini Insight Generator
 SYSTEM_PROMPT = """
-You are an expert restaurant operations analyst. 
+You are an expert restaurant operations analyst.
 You will be given structured data about a restaurant's inventory, menu items, and sales performance.
-Your job is to:
-1. Identify ingredients that are being overstocked relative to their sales velocity.
-2. Highlight menu items with poor sales.
-3. Suggest concrete, actionable purchasing or menu changes.
-4. Be specific — mention ingredient names, quantities, and dollar impact where possible.
-5. Keep insights concise and practical (bullet points preferred).
+
+Return ONLY a valid JSON object with NO markdown, NO backticks, NO extra text.
+
+The JSON must follow this exact schema:
+{
+  "summary": "One sentence overall assessment",
+  "overstocked": [
+    {
+      "ingredient": "Name",
+      "stock": 1234,
+      "days_of_supply": 99,
+      "shelf_life_days": 7,
+      "estimated_value": 9999.00,
+      "action": "Halt orders immediately"
+    }
+  ],
+  "poor_sellers": [
+    {
+      "item": "Menu Item Name",
+      "units_sold": 2,
+      "note": "Consider removing from menu"
+    }
+  ],
+  "suggested_actions": [
+    {
+      "title": "Short action title",
+      "description": "Detailed description",
+      "estimated_savings": 500.00,
+      "priority": "high"
+    }
+  ],
+  "purchasing_adjustments": [
+    {
+      "ingredient": "Name",
+      "recommendation": "halt | reduce | maintain | increase",
+      "detail": "Explanation"
+    }
+  ]
+}
 """
 
 
-def generate_insights(context: str, user_question: str = None) -> str:
-    """Send context + optional question to Gemini and return the insight text."""
+def generate_insights(context: str, user_question: str = None) -> dict:
+    """Send context + optional question to Gemini and return parsed JSON dict."""
+    import json
+
     client = genai.Client()
 
     question = user_question or (
-        "Analyse the restaurant data and give me 5–10 prioritised, actionable insights "
+        "Analyse the restaurant data and give prioritised, actionable insights "
         "about inventory purchasing, waste reduction, and menu performance."
     )
 
@@ -154,13 +189,25 @@ def generate_insights(context: str, user_question: str = None) -> str:
 
 --- QUESTION ---
 {question}
+
+Remember: Return ONLY valid JSON. No markdown, no backticks, no explanation.
 """
 
     response = client.models.generate_content(
         model="models/gemini-2.5-flash",
         contents=prompt,
     )
-    return response.text
+
+    raw = response.text.strip()
+
+    # Strip accidental markdown code fences if model ignores instructions
+    if raw.startswith("```"):
+        raw = raw.split("```")[1]
+        if raw.startswith("json"):
+            raw = raw[4:]
+    raw = raw.strip()
+
+    return json.loads(raw)
 
 
 # CLI Demo

@@ -8,6 +8,8 @@ from chatbot import build_context_from_firebase, generate_insights
 from dotenv import load_dotenv
 from firebase_admin import credentials, firestore
 from flask import Flask, jsonify, request
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 
 # import db as database
 from flask_cors import CORS
@@ -33,6 +35,11 @@ db = firestore.client()
 app = Flask(__name__)
 CORS(app)
 
+limiter = Limiter(
+    get_remote_address,
+    app=app,
+    default_limits=[]
+)
 
 # Test for Firestore connection
 @app.get("/api/firebase-test")
@@ -170,6 +177,7 @@ def record_sales():
 
 
 @app.route("/api/insights", methods=["POST"])
+@limiter.limit('1 per second')
 def get_insights():
     """
     Generate AI-powered insights from Firebase data.
@@ -188,18 +196,24 @@ def get_insights():
     """
     from chatbot import build_context_from_firebase, generate_insights
 
-    received_data = request.get_json() or {}
-    start_date = received_data["startDate"]
-    end_date = received_data["endDate"]
-    question = received_data["question"]
-
     try:
+        received_data = request.get_json() or {}
+        start_date = received_data["startDate"]
+        end_date = received_data["endDate"]
+        question = received_data["question"]
+
+        print('getting insights')
         context = build_context_from_firebase(start_date, end_date)
-        print("context are ", context)
+        # print("context are ", context)
         insights = generate_insights(context, question)
-        print("insights are ", insights)
+        # print("insights are ", insights)
+        print('-------')
+        print(insights)
+        print('-------')
         return jsonify({"insights": insights})
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         return jsonify({"error": str(e)}), 500
 
 
