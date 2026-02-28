@@ -6,6 +6,7 @@ export default function Page() {
   const [insights, setInsights] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [costSaved, setCostSaved] = useState()
 
   useEffect(() => {
     const controller = new AbortController();

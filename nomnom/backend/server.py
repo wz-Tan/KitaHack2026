@@ -175,6 +175,11 @@ def record_sales():
     print("Record sales")
     return jsonify({"status": "success"})
 
+@app.route("/insights/cost_saved", methods = ["GET"])
+def return_cost_saved():
+    amount_saved = database.cost_saved()
+    return jsonify({"cost_saved":amount_saved})
+
 
 @app.route("/api/insights", methods=["POST"])
 @limiter.limit('1 per second')
