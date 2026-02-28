@@ -11,3 +11,6 @@ Import CSV File to update your Firestore Database.
 Go into dashboard, pick a date and the respective filters to visualise the usage / sales of menu items and ingreidents over time!
 
 Go into insights and wait for the AI to generate actionable advice to reduce food waste and improve sustainability!
+
+Challenges Faced: Mapping insights onto Front-End, Figuring out best methods to store data for future referencing. 
+Future Steps: Integrate with third party food apps for real time feedback for restaurant owners and optimise AI insights by caching queries and results.
