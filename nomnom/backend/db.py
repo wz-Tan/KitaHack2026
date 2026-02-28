@@ -391,13 +391,12 @@ def retrieveSales(startDate, endDate):
     print("Total sales retrieved", data)
     return data
 
-
-def checkexpiry(startdate,enddate):
+def checkexpiry(startdate,enddate,current_date):
     inventory_df=makedataframe("inventory")
     ingredients_df=makedataframe("ingredients")
     pd_startdate=pd.to_datetime(startdate,utc=True)
     pd_enddate=pd.to_datetime(enddate,utc=True)
-    current_date=pd.Timestamp.now(tz="UTC")
+    current_date=pd.to_datetime(current_date,utc=True)
     expired_cost=0
 
     filtered_inventory_df=inventory_df[(inventory_df['date']>pd_startdate)&(inventory_df['date']<pd_enddate)]
@@ -409,4 +408,20 @@ def checkexpiry(startdate,enddate):
                 expired_cost+=amount*ingredients_df.loc[ingredientid]['price']
 
     return expired_cost
-#print(checkexpiry("2026-01-31","2026-02-05")
+print(checkexpiry("2026-01-28","2026-02-28","2026-02-28"))
+
+#will return -negative value if no data before this month, or no lesser waste before this month
+def cost_saved():
+    inventory_df=makedataframe("inventory")
+    startingdate=inventory_df['date'].min()
+    currentdate=pd.Timestamp.now(tz="UTC")
+    lastmonthdate=(currentdate-pd.DateOffset(months=1))
+
+    #calculate how many months is the duration of past data
+    pastduration=(lastmonthdate.year-startingdate.year)*12 + (lastmonthdate.month-startingdate.month) + (lastmonthdate.day-startingdate.day)/30
+
+    past_waste=checkexpiry(startingdate.strftime("%Y-%m-%d"),lastmonthdate.strftime("%Y-%m-%d"),lastmonthdate.strftime("%Y-%m-%d"))/pastduration#cost wasted per month of past data
+    current_waste=checkexpiry(lastmonthdate.strftime("%Y-%m-%d"),currentdate.strftime("%Y-%m-%d"),currentdate.strftime("%Y-%m-%d"))#cost wasted this month
+    print(current_waste,past_waste)
+    return past_waste-current_waste
+#print(cost_saved())
