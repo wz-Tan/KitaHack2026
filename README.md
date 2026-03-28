@@ -1,6 +1,8 @@
 NomNom is a project targeting SDG Goal 12 - Responsible Consumption for Kitahack 2026. 
 It implements NextJS and TailwindCSS for the Frontend, with Gemini API, Flask, Numpy and Firebase for the backend.
 
+This project aims to turn business records CSVs into actual actionable insights, particularly in analysing and predicting food sales and ingredient usage.
+
 To run the project, first git clone the url into your destination.
 Set up an env file based on the sample given. 
 Then cd into nomnom and run "npm run dev" to boot up the frontend. 
